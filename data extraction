@@ -1,0 +1,106 @@
+import time
+import csv
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+from selenium.common.exceptions import TimeoutException
+import os
+import pandas as pd
+import urllib.parse
+import urllib.request
+
+current_directory = os.getcwd()
+print("Current Directory:", current_directory)
+
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # To start the browser in invisible mode
+
+driver = webdriver.Chrome(options=chrome_options)
+
+# Login URL
+login_url = 'https://xxxx.com/de/signin'
+
+# Login and Password
+username = 'example'
+password = 'example'
+
+try:
+    driver.get(login_url)
+
+    username_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'user_login')))
+    password_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'user_pass')))
+
+    username_input.send_keys(username)
+    password_input.send_keys(password, Keys.RETURN) 
+
+    url_list = [
+        'URL-1',
+        'URL-2',
+        'URL-3'
+                    
+]
+
+    # An empty list for scraping results
+    scraped_data = []
+
+    # Pull data after login is complete
+    for url in url_list:
+        driver.get(url)
+
+        page_source = driver.page_source
+
+        # Analyze HTML content with BeautifulSoup
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        # Get the X Value
+        x_element = soup.find('span', class_='dictionary__name_txt', string='X')
+        if ean_element:
+            x_value = x_element.find_next('span', class_='dictionary__value_txt').text.strip()
+        else:
+            x_value = "Value not found"
+
+        # Get the Y Value
+        y_element = soup.find('span', class_='dictionary__name_txt', string='Y')
+        if y_element:
+            y_value = y_element.find_next('span', class_='dictionary__value_txt').text.strip()
+        else:
+            y_value = "Value not found"
+
+        # Get the Z Value
+        z_element = soup.find('h1', class_='z__name')
+        if z_element:
+            z_name = z_name_element.text.strip()
+        else:
+            z_name = "Value not found"
+
+
+
+        # Add the results to the list
+        scraped_data.append({
+            "X": x_value,
+            "Y": y_value,
+            "Z": z_name, 
+        })
+
+        # Add a wait for the download
+        time.sleep(2)  # You can adjust this time according to your desire
+
+finally:
+    # Write to CSV file after visiting all URLs
+    csv_file_path = "C:/---------"
+
+    with open(csv_file_path, mode="w", encoding="utf-8-sig", newline="") as csv_file:
+        fieldnames = ["X", "Y", "Z"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames, delimiter='\t')  # Tab delimited CSV
+        writer.writeheader()
+
+        # Write the URLs
+        for data in scraped_data:
+            
+
+    driver.quit()
